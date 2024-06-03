@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMovementController : MonoBehaviour
 {
     public PlayerMovement playerMovementScript;
+    public CameraFollow cameraFollow;
 
     void Update()
     {
@@ -17,6 +18,7 @@ public class PlayerMovementController : MonoBehaviour
     private void TogglePlayerMovement()
     {
         playerMovementScript.enabled = !playerMovementScript.enabled;
+        cameraFollow.enabled = !cameraFollow.enabled;
     }
 }
 
