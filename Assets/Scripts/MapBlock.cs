@@ -9,6 +9,8 @@ using UnityEngine.Tilemaps;
 
 public class MapBlock : MonoBehaviour
 {
+    public KeyCode mapCode;
+
     public bool isMovable;
     public Color emissionColor = Color.white; // 要设置的Emission颜色
     private Color originalColor;
@@ -25,7 +27,7 @@ public class MapBlock : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(mapCode))
         {
             isMovable = !isMovable;
             if (isHighLighted) 
