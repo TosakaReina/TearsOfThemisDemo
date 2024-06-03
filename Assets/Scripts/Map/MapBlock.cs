@@ -39,19 +39,25 @@ public class MapBlock : MonoBehaviour
                 isHighLighted = false;
                 isMovable = false;
                 stopHighlight();
+                MapBlockController.instance.DeselectBlock(this);
             }
 
             isMapOpened = !isMapOpened;
         }
 
         // detect block selected
-        if (Input.GetKeyDown(mapCode))
+        if (Input.GetKeyDown(mapCode) && MapBlockController.instance.CanSelectBlock(this))
         {
             isMovable = !isMovable;
             if (isHighLighted)
             {
                 stopHighlight();
                 isHighLighted = false;
+                MapBlockController.instance.DeselectBlock(this);
+            }
+            else
+            {
+                MapBlockController.instance.SelectBlock(this);
             }
             Debug.Log(isHighLighted);
         }
