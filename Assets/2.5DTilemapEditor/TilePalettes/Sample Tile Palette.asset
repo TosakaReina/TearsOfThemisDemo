@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4887c782dd0340049ba06821cfecd0ce, type: 3}
+  m_Name: Sample Tile Palette
+  m_EditorClassIdentifier: 
+  prefabs:
+  - {fileID: 4604538343429840714, guid: 9d1eab361ce5fd84597912fc78db01ed, type: 3}
+  - {fileID: 6202138768694483311, guid: d4b5ec4a92d8ce74f8f3c2fe65ac0313, type: 3}
+  - {fileID: 153644271360897016, guid: 215317162d602bc46872745e9ea8cf7a, type: 3}
+  - {fileID: 3011348858197008606, guid: 3169dfe536e8ec640b4e6347c55d0069, type: 3}
+  - {fileID: 6845221365815267057, guid: a9a58753870835b4e87a7d2aaa067784, type: 3}
+  - {fileID: 8821098516103610644, guid: 0258d2f64c677024d8ec3baf0bb7c26d, type: 3}
+  - {fileID: 3523917811907491210, guid: be746cfd147724243b8c573c0b0950e3, type: 3}
+  - {fileID: 68849978006207873, guid: 2a18a8c1b0475234fbf9b47534c31aea, type: 3}
+  - {fileID: 7786883517537884134, guid: 0385767751dccbd4fab303e5bc0140e1, type: 3}
+  - {fileID: 61688013192627706, guid: 237e4bf65ac41804c9d6a816d2dc188e, type: 3}
+  - {fileID: 1311836052888403992, guid: e2589303a58fa24428e74e9f06840e33, type: 3}
+  - {fileID: 6442155935742263155, guid: 6a59ba9dcc7a1a0428cde0dca0bcca61, type: 3}
+  - {fileID: 3908494951186735397, guid: 61a79fcba1009cd47bb4b70e0a0b6c8f, type: 3}
+  - {fileID: 5330601821766564554, guid: 6ad13b76b848ee343bd3bae1a683a610, type: 3}
+  - {fileID: 4515368034234896120, guid: a5ae0dbf5ae81d34889ff77a4f1791d7, type: 3}
+  - {fileID: 2358940280701036635, guid: cb223b7260508f44b9b2ccb21909ce6e, type: 3}
+  - {fileID: 4819182654627691073, guid: 5e9466df7c2a14443bf94f1fa8666b76, type: 3}
+  - {fileID: 8298662905817039708, guid: 9ad3495d650dd2b47ab1be4ea6e29924, type: 3}
+  - {fileID: 881284680175810530, guid: bb7750000812a9d4ca41f57fc176a02c, type: 3}
+  - {fileID: 4478431158112657820, guid: 85475e56d8055f540b8cbe7a0e84f04b, type: 3}
+  - {fileID: 5237361722369620753, guid: a00d0737d0b151843ac7a5341f0b92dd, type: 3}
+  - {fileID: 139837888880120053, guid: 47df702bf06b9f549a0f3c2de3ad737c, type: 3}
+  - {fileID: 7276103785977297111, guid: f8bfe58cd7be33a489be09cbc474898a, type: 3}
+  - {fileID: 1924991137864772539, guid: 8921f01750ed1d84e8300ad6957cac02, type: 3}
