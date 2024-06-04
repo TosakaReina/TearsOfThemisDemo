@@ -4,28 +4,28 @@ using UnityEngine;
 
 public class PlayerSwitcher : MonoBehaviour
 {
-    public Transform player1; // 玩家1的Transform
-    public Transform player2; // 玩家2的Transform
-    public CameraFollow cameraFollow; // 摄像机跟随脚本
+    public Transform player1; 
+    public Transform player2; 
+    public CameraFollow cameraFollow;
 
-    private Transform currentPlayer; // 当前玩家的Transform
-    private int currentPlayerIndex = 1; // 当前玩家的索引
+    private Transform currentPlayer; // current player's transform
+    private int currentPlayerIndex = 1; 
 
 
 
     void Start()
     {
-        // 初始化当前玩家为玩家1
+        // initialize player 1 as current player
         currentPlayer = player1;
-        cameraFollow.SetTarget(currentPlayer); // 设置摄像机初始目标
-        EnablePlayerComponents(currentPlayer); // 启用当前玩家的组件
-        DisablePlayerComponents(player2); // 禁用非当前玩家的组件
+        cameraFollow.SetTarget(currentPlayer); 
+        EnablePlayerComponents(currentPlayer); 
+        DisablePlayerComponents(player2); // disable other player's Components
     }
 
     void Update()
     {
-        // 检测按键切换玩家
-        if (Input.GetKeyDown(KeyCode.C))
+        // switch player if press C and Map is not opened
+        if (Input.GetKeyDown(KeyCode.C) && !MapMovementController.IsMapOpened)
         {
             SwitchPlayer();
         }
@@ -47,42 +47,38 @@ public class PlayerSwitcher : MonoBehaviour
     {
         if (currentPlayerIndex == 1)
         {
-            DisablePlayerComponents(currentPlayer); // 禁用当前玩家的组件
+            DisablePlayerComponents(currentPlayer); 
             currentPlayer = player2;
             currentPlayerIndex = 2;
         }
         else
         {
-            DisablePlayerComponents(currentPlayer); // 禁用当前玩家的组件
+            DisablePlayerComponents(currentPlayer);
             currentPlayer = player1;
             currentPlayerIndex = 1;
         }
 
-        // 启用新玩家的组件
+        // enable other player's components
         EnablePlayerComponents(currentPlayer);
-        // 更新摄像机的跟随目标
+        // update camera follow target
         cameraFollow.SetTarget(currentPlayer);
     }
 
     private void EnablePlayerComponents(Transform player)
     {
-        // 启用玩家的移动组件等
-        var movementComponent = player.GetComponent<PlayerMovement>(); // 假设玩家的移动组件名为PlayerMovement
+        var movementComponent = player.GetComponent<PlayerMovement>(); 
         if (movementComponent != null)
         {
             movementComponent.enabled = true;
         }
-        // 可以启用其他需要启用的组件
     }
 
     private void DisablePlayerComponents(Transform player)
     {
-        // 禁用玩家的移动组件等
-        var movementComponent = player.GetComponent<PlayerMovement>(); // 假设玩家的移动组件名为PlayerMovement
+        var movementComponent = player.GetComponent<PlayerMovement>(); 
         if (movementComponent != null)
         {
             movementComponent.enabled = false;
         }
-        // 可以禁用其他需要禁用的组件
     }
 }

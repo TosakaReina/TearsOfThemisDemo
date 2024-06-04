@@ -12,8 +12,6 @@ public class MapBlock : MonoBehaviour
     private List<Transform> targetTransforms = new List<Transform>();
     private bool isMovable;
     private bool isHighLighted = false;
-    private bool isMapOpened = false;
-
 
     // maximum move distance respectively
     [Header("Movement Limitation")]
@@ -44,8 +42,6 @@ public class MapBlock : MonoBehaviour
                 stopHighlight();
                 MapBlockController.instance.DeselectBlock(this);
             }
-
-            isMapOpened = !isMapOpened;
         }
 
         // detect block selected
@@ -65,7 +61,7 @@ public class MapBlock : MonoBehaviour
             Debug.Log(isHighLighted);
         }
 
-        if (isMovable && isMapOpened)
+        if (isMovable && MapMovementController.IsMapOpened)
         {
             if (!isHighLighted)
             {

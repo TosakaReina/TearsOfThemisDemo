@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MapMovementController : MonoBehaviour
 {
+    public static bool IsMapOpened { get; private set; } = false; // detect whether map is opened
 
     [Header("Camera")]
     public Camera mainCamera;
@@ -17,8 +18,6 @@ public class MapMovementController : MonoBehaviour
     public float originalCameraSize;
 
     public float transitionDuration = 1f; // duration of the transition animation
-
-    private bool isMapOpen = false;
     private Coroutine transitionCoroutine;
 
     void Start()
@@ -45,14 +44,14 @@ public class MapMovementController : MonoBehaviour
 
     private void ToggleMap()
     {
-        isMapOpen = !isMapOpen;
+        IsMapOpened = !IsMapOpened;
 
         if (transitionCoroutine != null)
         {
             StopCoroutine(transitionCoroutine);
         }
 
-        if (isMapOpen)
+        if (IsMapOpened)
         {
             UpdateOriginalCamera();
             mainCamera.GetComponent<CameraFollow>().enabled = false;
