@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
@@ -22,7 +23,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // ªÒ»° ‰»Î
+        if (!enabled) return; 
+
+        // get Input
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
@@ -46,6 +49,8 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!enabled) return; 
+
         // apply movement
         Vector3 newPosition = rb.position + movement * Time.fixedDeltaTime;
         rb.MovePosition(newPosition);

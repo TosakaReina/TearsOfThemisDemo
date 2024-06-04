@@ -21,7 +21,10 @@ public class MapBlock : MonoBehaviour
     public float downMaxMoveDistance = 5f; 
     public float leftMaxMoveDistance = 5f; 
     public float rightMaxMoveDistance = 5f; 
-    private Vector3 originalPosition; 
+
+    private Vector3 originalPosition;
+    private List<Transform> playerTransforms = new List<Transform>(); // track all players entering
+
 
     private void Start()
     {
@@ -105,7 +108,14 @@ public class MapBlock : MonoBehaviour
                 }
             }
 
+            Vector3 moveDelta = targetPosition - transform.position;
+
+            // move MapBlock and players simultaneously
             transform.position = targetPosition;
+            foreach (var player in playerTransforms)
+            {
+                player.position += moveDelta;
+            }
         }
     }
 
@@ -155,6 +165,28 @@ public class MapBlock : MonoBehaviour
             else
             {
                 Debug.LogWarning("Not Support Emission");
+            }
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            if (!playerTransforms.Contains(other.transform))
+            {
+                playerTransforms.Add(other.transform);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            if (playerTransforms.Contains(other.transform))
+            {
+                playerTransforms.Remove(other.transform);
             }
         }
     }

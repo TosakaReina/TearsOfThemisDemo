@@ -23,9 +23,7 @@ public class MapMovementController : MonoBehaviour
 
     void Start()
     {
-        originalCameraPosition = mainCamera.transform.position;
-        originalCameraRotation = mainCamera.transform.rotation;
-        originalCameraSize = mainCamera.orthographicSize;
+        UpdateOriginalCamera();
     }
 
     void Update()
@@ -35,6 +33,14 @@ public class MapMovementController : MonoBehaviour
             Debug.Log("Toggle Map");
             ToggleMap();
         }
+    }
+
+    
+    private void UpdateOriginalCamera()
+    {
+        originalCameraPosition = mainCamera.transform.position;
+        originalCameraRotation = mainCamera.transform.rotation;
+        originalCameraSize = mainCamera.orthographicSize;
     }
 
     private void ToggleMap()
@@ -48,10 +54,13 @@ public class MapMovementController : MonoBehaviour
 
         if (isMapOpen)
         {
+            UpdateOriginalCamera();
+            mainCamera.GetComponent<CameraFollow>().enabled = false;
             transitionCoroutine = StartCoroutine(TransitionCamera(mapView.transform.position, mapView.transform.rotation, zoomOutSize));
         }
         else
         {
+            mainCamera.GetComponent<CameraFollow>().enabled = true;
             transitionCoroutine = StartCoroutine(TransitionCamera(originalCameraPosition, originalCameraRotation, originalCameraSize));
         }
     }
