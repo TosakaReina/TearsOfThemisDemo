@@ -21,96 +21,102 @@ public class MapBlock : MonoBehaviour
     public float rightMaxMoveDistance = 5f; 
 
     private Vector3 originalPosition;
-    private List<Transform> playerTransforms = new List<Transform>(); // track all players entering
+    private List<Transform> itemsTransforms = new List<Transform>(); // track all players entering
 
+    [Header("Switch Material")]
+    public Material newMaterial;
+    public bool movableSwitched = true;
 
     private void Start()
     {
-        GetTargetTransform(transform);
+        GetTargetTransform(transform); // get all tilemap block children
         originalPosition = transform.position; // record original position
     }
 
     private void Update()
     {
-        // detect map opened
-        if (Input.GetKeyDown(KeyCode.M))
+        // detect whether have switched to movable map block
+        if (movableSwitched)
         {
-            if (isHighLighted)
+            // detect map opened
+            if (Input.GetKeyDown(KeyCode.M))
             {
-                isHighLighted = false;
-                isMovable = false;
-                stopHighlight();
-                MapBlockController.instance.DeselectBlock(this);
-            }
-        }
-
-        // detect block selected
-        if (Input.GetKeyDown(mapCode) && MapBlockController.instance.CanSelectBlock(this))
-        {
-            isMovable = !isMovable;
-            if (isHighLighted)
-            {
-                stopHighlight();
-                isHighLighted = false;
-                MapBlockController.instance.DeselectBlock(this);
-            }
-            else
-            {
-                MapBlockController.instance.SelectBlock(this);
-            }
-            Debug.Log(isHighLighted);
-        }
-
-        if (isMovable && MapMovementController.IsMapOpened)
-        {
-            if (!isHighLighted)
-            {
-                HighlightSelectedBlock();
-                isHighLighted = true;
-            }
-
-            Vector3 targetPosition = transform.position;
-
-            if (Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                targetPosition += Vector3.down;
-                if (originalPosition.y - targetPosition.y > downMaxMoveDistance)
+                if (isHighLighted)
                 {
-                    targetPosition = transform.position; // if exceeding the limit, restore to original position
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                targetPosition += Vector3.up;
-                if (targetPosition.y - originalPosition.y > upMaxMoveDistance)
-                {
-                    targetPosition = transform.position; 
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                targetPosition += Vector3.left;
-                if (originalPosition.x - targetPosition.x > leftMaxMoveDistance)
-                {
-                    targetPosition = transform.position; 
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                targetPosition += Vector3.right;
-                if (targetPosition.x - originalPosition.x > rightMaxMoveDistance)
-                {
-                    targetPosition = transform.position; 
+                    isHighLighted = false;
+                    isMovable = false;
+                    StopHighlight();
+                    MapBlockController.instance.DeselectBlock(this);
                 }
             }
 
-            Vector3 moveDelta = targetPosition - transform.position;
-
-            // move MapBlock and players simultaneously
-            transform.position = targetPosition;
-            foreach (var player in playerTransforms)
+            // detect block selected
+            if (Input.GetKeyDown(mapCode) && MapBlockController.instance.CanSelectBlock(this))
             {
-                player.position += moveDelta;
+                isMovable = !isMovable;
+                if (isHighLighted)
+                {
+                    StopHighlight();
+                    isHighLighted = false;
+                    MapBlockController.instance.DeselectBlock(this);
+                }
+                else
+                {
+                    MapBlockController.instance.SelectBlock(this);
+                }
+            }
+
+            if (isMovable && MapMovementController.IsMapOpened)
+            {
+                if (!isHighLighted)
+                {
+                    HighlightSelectedBlock();
+                    isHighLighted = true;
+                }
+
+                Vector3 targetPosition = transform.position;
+
+                if (Input.GetKeyDown(KeyCode.DownArrow))
+                {
+                    targetPosition += Vector3.down;
+                    if (originalPosition.y - targetPosition.y > downMaxMoveDistance)
+                    {
+                        targetPosition = transform.position; // if exceeding the limit, restore to original position
+                    }
+                }
+                else if (Input.GetKeyDown(KeyCode.UpArrow))
+                {
+                    targetPosition += Vector3.up;
+                    if (targetPosition.y - originalPosition.y > upMaxMoveDistance)
+                    {
+                        targetPosition = transform.position;
+                    }
+                }
+                else if (Input.GetKeyDown(KeyCode.LeftArrow))
+                {
+                    targetPosition += Vector3.left;
+                    if (originalPosition.x - targetPosition.x > leftMaxMoveDistance)
+                    {
+                        targetPosition = transform.position;
+                    }
+                }
+                else if (Input.GetKeyDown(KeyCode.RightArrow))
+                {
+                    targetPosition += Vector3.right;
+                    if (targetPosition.x - originalPosition.x > rightMaxMoveDistance)
+                    {
+                        targetPosition = transform.position;
+                    }
+                }
+
+                Vector3 moveDelta = targetPosition - transform.position;
+
+                // move MapBlock, items and players simultaneously
+                transform.position = targetPosition;
+                foreach (var item in itemsTransforms)
+                {
+                    item.position += moveDelta;
+                }
             }
         }
     }
@@ -126,6 +132,7 @@ public class MapBlock : MonoBehaviour
         }
     }
 
+    // selected
     public void HighlightSelectedBlock()
     {
         if (targetTransforms == null)
@@ -149,7 +156,8 @@ public class MapBlock : MonoBehaviour
         }
     }
 
-    public void stopHighlight()
+    // deselected
+    public void StopHighlight()
     {
         foreach (Transform child in targetTransforms)
         {
@@ -165,24 +173,34 @@ public class MapBlock : MonoBehaviour
         }
     }
 
+    // change to movable block material
+    public void SwitchMaterial()
+    {
+        foreach (Transform child in targetTransforms)
+        {
+            MeshRenderer renderer = child.GetComponent<MeshRenderer>();
+            renderer.material = newMaterial;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") || other.CompareTag("Item"))
         {
-            if (!playerTransforms.Contains(other.transform))
+            if (!itemsTransforms.Contains(other.transform))
             {
-                playerTransforms.Add(other.transform);
+                itemsTransforms.Add(other.transform);
             }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") || other.CompareTag("Item"))
         {
-            if (playerTransforms.Contains(other.transform))
+            if (itemsTransforms.Contains(other.transform))
             {
-                playerTransforms.Remove(other.transform);
+                itemsTransforms.Remove(other.transform);
             }
         }
     }
