@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class PlayerSwitcher : MonoBehaviour
 {
-    public Transform player1; 
-    public Transform player2; 
+    public Transform player1;
+    public Transform player2;
     public CameraSwitchController cameraSwitchController;
 
     private CameraFollow cameraFollow;
     private Transform currentPlayer; // current player's transform
-    private int currentPlayerIndex = 1; 
+    private int currentPlayerIndex = 1;
 
     void Start()
     {
         // initialize player 1 as current player
         currentPlayer = player1;
         cameraFollow = cameraSwitchController.currentCamera.GetComponent<CameraFollow>();
-        cameraFollow.SetTarget(currentPlayer); 
-        EnablePlayerComponents(currentPlayer); 
+        cameraFollow.SetTarget(currentPlayer);
+        EnablePlayerComponents(currentPlayer);
         DisablePlayerComponents(player2); // disable other player's Components
     }
 
@@ -31,7 +31,7 @@ public class PlayerSwitcher : MonoBehaviour
         }
 
         // toggle current player's movement script
-        if (Input.GetKeyDown(KeyCode.M)) 
+        if (Input.GetKeyDown(KeyCode.M))
         {
             TogglePlayerMovement();
         }
@@ -45,37 +45,31 @@ public class PlayerSwitcher : MonoBehaviour
 
     private void SwitchPlayer()
     {
+        // Disable current player components
+        DisablePlayerComponents(currentPlayer);
+
+        // Switch current player
         if (currentPlayerIndex == 1)
         {
-            DisablePlayerComponents(currentPlayer); 
             currentPlayer = player2;
             currentPlayerIndex = 2;
         }
         else
         {
-            DisablePlayerComponents(currentPlayer);
             currentPlayer = player1;
             currentPlayerIndex = 1;
         }
 
-        // detect whether all players is stay at same region (front or back)
-        if (player1.GetComponent<PlayerMovement>().isFront != player2.GetComponent<PlayerMovement>().isFront)
-        {
-            UpdateCameraFollow();
-        }
-        else 
-        {
-            // update camera follow target
-            cameraFollow.SetTarget(currentPlayer);
-        }
-
-        // enable other player's components
+        // Enable new current player components
         EnablePlayerComponents(currentPlayer);
+
+        // Update camera follow target
+        UpdateCameraFollow();
     }
 
     private void EnablePlayerComponents(Transform player)
     {
-        var movementComponent = player.GetComponent<PlayerMovement>(); 
+        var movementComponent = player.GetComponent<PlayerMovement>();
         if (movementComponent != null)
         {
             movementComponent.enabled = true;
@@ -84,7 +78,7 @@ public class PlayerSwitcher : MonoBehaviour
 
     private void DisablePlayerComponents(Transform player)
     {
-        var movementComponent = player.GetComponent<PlayerMovement>(); 
+        var movementComponent = player.GetComponent<PlayerMovement>();
         if (movementComponent != null)
         {
             movementComponent.enabled = false;
@@ -93,7 +87,16 @@ public class PlayerSwitcher : MonoBehaviour
 
     private void UpdateCameraFollow()
     {
-        cameraSwitchController.ToggleCamera(currentPlayer);
+        // Detect whether both players are in the same region (front or back)
+        if (player1.GetComponent<PlayerMovement>().isFront != player2.GetComponent<PlayerMovement>().isFront)
+        {
+            // Switch camera based on the current player's region
+            cameraSwitchController.ToggleCamera(currentPlayer);
+        }
+
+        // Update camera follow component with the new target
         cameraFollow = cameraSwitchController.currentCamera.GetComponent<CameraFollow>();
+        cameraFollow.SetTarget(currentPlayer);
     }
+
 }

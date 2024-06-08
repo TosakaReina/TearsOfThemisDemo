@@ -6,40 +6,50 @@ public class MapMovementController : MonoBehaviour
 {
     public static bool IsMapOpened { get; private set; } = false; // detect whether map is opened
 
-    [Header("Camera")]
-    public Camera mainCamera;
+    [Header("Cameras")]
+    public Camera mainCamera1;
+    public Camera mainCamera2;
     public float zoomOutSize;
-    public GameObject mapView;
-
-    [HideInInspector]
-    public Vector3 originalCameraPosition;
-    [HideInInspector]
-    public Quaternion originalCameraRotation;
-    public float originalCameraSize;
+    public Transform mapFrontView;
+    public Transform mapBackView;
+    private Transform currentView;
 
     public float transitionDuration = 1f; // duration of the transition animation
     private Coroutine transitionCoroutine;
 
+    private Camera activeCamera;
+    private CameraFollow activeCameraFollow;
+
     void Start()
     {
-        UpdateOriginalCamera();
+        UpdateActiveCamera();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M)) 
+        if (Input.GetKeyDown(KeyCode.M))
         {
             Debug.Log("Toggle Map");
             ToggleMap();
         }
     }
 
-    
-    private void UpdateOriginalCamera()
+    private void UpdateActiveCamera()
     {
-        originalCameraPosition = mainCamera.transform.position;
-        originalCameraRotation = mainCamera.transform.rotation;
-        originalCameraSize = mainCamera.orthographicSize;
+        // front camera
+        if (mainCamera1.isActiveAndEnabled)
+        {
+            activeCamera = mainCamera1;
+            activeCameraFollow = mainCamera1.GetComponent<CameraFollow>();
+            currentView = mapFrontView;
+        }
+        // back camera
+        else if (mainCamera2.isActiveAndEnabled)
+        {
+            activeCamera = mainCamera2;
+            activeCameraFollow = mainCamera2.GetComponent<CameraFollow>();
+            currentView = mapBackView;
+        }
     }
 
     private void ToggleMap()
@@ -53,22 +63,35 @@ public class MapMovementController : MonoBehaviour
 
         if (IsMapOpened)
         {
-            UpdateOriginalCamera();
-            mainCamera.GetComponent<CameraFollow>().enabled = false;
-            transitionCoroutine = StartCoroutine(TransitionCamera(mapView.transform.position, mapView.transform.rotation, zoomOutSize));
+            UpdateActiveCamera();
+            activeCameraFollow.enabled = false;
+            transitionCoroutine = StartCoroutine(TransitionCamera(currentView.position, currentView.rotation, zoomOutSize));
         }
         else
         {
-            mainCamera.GetComponent<CameraFollow>().enabled = true;
-            transitionCoroutine = StartCoroutine(TransitionCamera(originalCameraPosition, originalCameraRotation, originalCameraSize));
+            activeCameraFollow.enabled = true;
+            //transitionCoroutine = StartCoroutine(TransitionCamera(activeCameraFollow.target.position + activeCameraFollow.offset, 
+            //    activeCameraFollow.target.rotation, activeCameraFollow.GetComponent<Camera>().orthographicSize));
+
+            Quaternion targetRotation = activeCameraFollow.target.rotation;
+            // if back camera is active, rotate 180 degrees.
+            if (mainCamera2.isActiveAndEnabled)
+            {
+                Debug.Log("99999");
+                targetRotation *= Quaternion.Euler(0, 180, 0);
+            }
+            transitionCoroutine = StartCoroutine(TransitionCamera(activeCameraFollow.target.position + activeCameraFollow.offset,
+               targetRotation, activeCameraFollow.GetComponent<Camera>().orthographicSize));
+            //transitionCoroutine = StartCoroutine(TransitionCamera(targetPosition, targetRotation, 
+            //    activeCameraFollow.GetComponent<Camera>().orthographicSize));
         }
     }
 
     private IEnumerator TransitionCamera(Vector3 targetPosition, Quaternion targetRotation, float targetSize)
     {
-        Vector3 startPosition = mainCamera.transform.position;
-        Quaternion startRotation = mainCamera.transform.rotation;
-        float startSize = mainCamera.orthographicSize;
+        Vector3 startPosition = activeCamera.transform.position;
+        Quaternion startRotation = activeCamera.transform.rotation;
+        float startSize = activeCamera.orthographicSize;
 
         float elapsedTime = 0f;
 
@@ -77,15 +100,15 @@ public class MapMovementController : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / transitionDuration);
 
-            mainCamera.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
-            mainCamera.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
-            mainCamera.orthographicSize = Mathf.Lerp(startSize, targetSize, t);
+            activeCamera.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+            activeCamera.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
+            activeCamera.orthographicSize = Mathf.Lerp(startSize, targetSize, t);
 
             yield return null;
         }
 
-        mainCamera.transform.position = targetPosition;
-        mainCamera.transform.rotation = targetRotation;
-        mainCamera.orthographicSize = targetSize;
+        activeCamera.transform.position = targetPosition;
+        activeCamera.transform.rotation = targetRotation;
+        activeCamera.orthographicSize = targetSize;
     }
 }
