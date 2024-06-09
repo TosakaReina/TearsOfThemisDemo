@@ -20,6 +20,10 @@ public class MapMovementController : MonoBehaviour
     private Camera activeCamera;
     private CameraFollow activeCameraFollow;
 
+    public GameObject MapHit;
+    public GameObject mapBlockNums;
+
+
     void Start()
     {
         UpdateActiveCamera();
@@ -62,12 +66,20 @@ public class MapMovementController : MonoBehaviour
 
         if (IsMapOpened)
         {
+            // Set UI Active
+            MapHit.SetActive(true);
+            mapBlockNums.SetActive(true);
+
             UpdateActiveCamera();
-            activeCameraFollow.enabled = false;
+            activeCameraFollow.enabled = false; 
             transitionCoroutine = StartCoroutine(TransitionCamera(currentView.position, currentView.rotation, zoomOutSize));
         }
         else
         {
+            // Set UI Deactive
+            MapHit.SetActive(false);
+            mapBlockNums.SetActive(false);
+
             activeCameraFollow.enabled = true;
             //transitionCoroutine = StartCoroutine(TransitionCamera(activeCameraFollow.target.position + activeCameraFollow.offset, 
             //    activeCameraFollow.target.rotation, activeCameraFollow.GetComponent<Camera>().orthographicSize));
@@ -76,7 +88,6 @@ public class MapMovementController : MonoBehaviour
             // if back camera is active, rotate 180 degrees.
             if (mainCamera2.isActiveAndEnabled)
             {
-                Debug.Log("99999");
                 targetRotation *= Quaternion.Euler(0, 180, 0);
             }
             transitionCoroutine = StartCoroutine(TransitionCamera(activeCameraFollow.target.position + activeCameraFollow.offset,
