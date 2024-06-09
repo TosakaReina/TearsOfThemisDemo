@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 [DisallowMultipleComponent]
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
+    public float boostedJumpForce = 20f; 
 
     public LayerMask groundLayer;
     public Transform groundCheck;
@@ -16,12 +18,16 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private Vector3 movement;
     private bool isGrounded;
+    private bool isBoostedJump = false; 
+    private bool isLifted = false; 
 
     //[HideInInspector]
     public bool isFront = true; // detect which region (front/back) the player is staying at
     private float switchCooldown = 1.0f; // switch CD
     private float lastSwitchTime = 0f;
     private bool canMove = true;
+
+    public UnityEvent onJump;
 
     void Start()
     {
@@ -30,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (!enabled || !canMove) return; 
+        if (!enabled) return;
 
         // get Input
         float moveHorizontal = Input.GetAxis("Horizontal");
@@ -47,24 +53,43 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
 
         // jump
-        if (isGrounded && Input.GetButtonDown("Jump"))
+        if ((isGrounded || isLifted) && Input.GetButtonDown("Jump"))
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            float currentJumpForce = isBoostedJump ? boostedJumpForce : jumpForce;
+            rb.useGravity = true; //
+            rb.AddForce(Vector3.up * currentJumpForce, ForceMode.Impulse);
+
+            // if lifted, set it false after jumping
+            if (isLifted)
+            {
+                isLifted = false;
+                isBoostedJump = false;
+                canMove = true; 
+
+                onJump.Invoke();
+            }
         }
 
-        movement = new Vector3(moveHorizontal, 0.0f, moveVertical).normalized * moveSpeed;
+        if (!isLifted && canMove) // movement is only allowed if not lifted
+        {
+            movement = new Vector3(moveHorizontal, 0.0f, moveVertical).normalized * moveSpeed;
+        }
+        else
+        {
+            movement = Vector3.zero; // can't move when lifted
+        }
 
         // faster falling 
         if (rb.velocity.y < 0)
         {
             // 2.5f means gravity factor
-            rb.velocity += Vector3.up * Physics2D.gravity.y * (2.5f - 1) * Time.deltaTime;
-        } 
+            rb.velocity += Vector3.up * Physics.gravity.y * (2.5f - 1) * Time.deltaTime;
+        }
     }
 
     void FixedUpdate()
     {
-        if (!enabled || !canMove) return; 
+        if (!enabled || !canMove) return;
 
         // apply movement
         Vector3 newPosition = rb.position + movement * Time.fixedDeltaTime;
@@ -82,7 +107,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // 
     public IEnumerator MoveToPosition(Vector3 targetPosition, float duration)
     {
         canMove = false;
@@ -99,6 +123,20 @@ public class PlayerMovement : MonoBehaviour
         canMove = true;
     }
 
+    public void BoostJump(bool isBoosted)
+    {
+        isBoostedJump = isBoosted;
+    }
+
+    public void SetLifted(bool lifted)
+    {
+        isLifted = lifted;
+        rb.useGravity = !lifted; 
+        if (lifted)
+        {
+            canMove = false; // restrict movement when lifted
+        }
+    }
 
     void OnDrawGizmosSelected()
     {

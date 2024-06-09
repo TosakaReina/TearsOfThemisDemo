@@ -29,7 +29,6 @@ public class MapMovementController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.M))
         {
-            Debug.Log("Toggle Map");
             ToggleMap();
         }
     }
